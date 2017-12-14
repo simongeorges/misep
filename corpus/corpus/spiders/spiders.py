@@ -2,7 +2,7 @@
 import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import Rule, CrawlSpider
-from corpus.items import InlinksItem
+from corpus.items import InlinksItem,CorpusItem
 
 class InlinksSpider(CrawlSpider):
     # The name of the spider
@@ -50,5 +50,42 @@ class InlinksSpider(CrawlSpider):
                 item['source'] = response.url
                 item['target'] = link.url
                 items.append(item)
+        # Return all the found items
+        return items
+
+
+class CorpusSpider(CrawlSpider):
+    # The name of the spider
+    name = "corpus"
+
+    # The domains that are allowed (links to other domains are skipped)
+    allowed_domains = ["localhost"]
+
+    # The URLs to start with
+    start_urls = ["http://localhost/moi/"]
+    # This time, no need to use a callback on the links
+    rules = [
+        Rule(
+            LinkExtractor(
+                canonicalize=True,
+                unique=True
+            ),
+            follow=True,
+            callback="parse_items"
+        )
+    ]
+
+    # Method which starts the requests by visiting all URLs specified in start_urls
+    def start_requests(self):
+        for url in self.start_urls:
+            yield scrapy.Request(url, callback=self.parse, dont_filter=True)
+
+    # Method for parsing items
+    def parse_items(self, response):
+        items = []
+        item = CorpusItem()
+        item['title'] = response.css("title").extract_first()
+        item['body'] = response.css("body").extract_first()
+        items.append(item)
         # Return all the found items
         return items
