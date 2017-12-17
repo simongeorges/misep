@@ -84,8 +84,9 @@ class CorpusSpider(CrawlSpider):
     def parse_items(self, response):
         items = []
         item = CorpusItem()
-        item['title'] = response.css("title").extract_first()
-        item['body'] = response.css("body").extract_first()
+        item['url'] = response.url
+        item['title'] = response.css("title").extract_first().encode('utf-8')
+        item['body'] = response.css("body").extract_first().encode('utf-8')
         items.append(item)
         # Return all the found items
         return items

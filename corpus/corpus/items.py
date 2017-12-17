@@ -9,6 +9,8 @@ class InlinksItem(scrapy.Item):
 
 
 class CorpusItem(scrapy.Item):
+    # The source URL
+    url = scrapy.Field()
     # TITLE tag
     title = scrapy.Field()
     # BODY tag
