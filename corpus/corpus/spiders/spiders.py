@@ -9,10 +9,10 @@ class InlinksSpider(CrawlSpider):
     name = "inlinks"
 
     # The domains that are allowed (links to other domains are skipped)
-    allowed_domains = ["localhost"]
+    allowed_domains = ["makina-corpus.com"]
 
     # The URLs to start with
-    start_urls = ["http://localhost/moi/"]
+    start_urls = ["https://makina-corpus.com"]
 
     # This spider has one rule: extract all (unique and canonicalized) links, follow them and parse them using the parse_items method
     rules = [
@@ -59,34 +59,29 @@ class CorpusSpider(CrawlSpider):
     name = "corpus"
 
     # The domains that are allowed (links to other domains are skipped)
-    allowed_domains = ["localhost"]
+    allowed_domains = ["paris.seo-campus.org"]
+    denied_domains = ["twitter.com", "pinterest.com"]
 
     # The URLs to start with
-    start_urls = ["http://localhost/moi/"]
-    # This time, no need to use a callback on the links
-    rules = [
-        Rule(
-            LinkExtractor(
-                canonicalize=True,
-                unique=True
-            ),
-            follow=True,
-            callback="parse_items"
-        )
-    ]
+    start_urls = ["http://paris.seo-campus.org/"]
+
+    # The LinkExtractor
+    le = LinkExtractor(canonicalize=True, unique=True, allow_domains = allowed_domains, deny_domains = denied_domains)
 
     # Method which starts the requests by visiting all URLs specified in start_urls
     def start_requests(self):
         for url in self.start_urls:
             yield scrapy.Request(url, callback=self.parse, dont_filter=True)
 
-    # Method for parsing items
-    def parse_items(self, response):
-        items = []
+    def parse_attr(self, response):
         item = CorpusItem()
         item['url'] = response.url
         item['title'] = response.css("title").extract_first()
         item['body'] = response.css("body").extract_first()
-        items.append(item)
-        # Return all the found items
-        return items
+        return item
+
+    # Method for parsing items
+    def parse(self, response):
+        links = self.le.extract_links(response)
+        for link in links:
+            yield scrapy.Request(link.url, callback=self.parse_attr)

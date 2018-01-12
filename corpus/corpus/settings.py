@@ -65,7 +65,8 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'corpus.pipelines.CorpusPipeline': 300,
+    'corpus.pipelines.RemoveTagsPipeline': 300,
+    'corpus.pipelines.Word2VecPipeline': 350,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
