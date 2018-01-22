@@ -6,13 +6,13 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 import re
 import time
+from w3lib.html import remove_tags, remove_tags_with_content
 
 class RemoveTagsPipeline(object):
     # Method which tries to remove HTML tags from text
     def remove_tags(whocares, string):
-        string = re.sub('<script[\s\S]+?/script>', '', string)
-        string = re.sub('<style[\s\S]+?/style>', '', string)
-        string = re.sub('<[^<]+?>', ' ', string)
+        string = remove_tags_with_content(string, which_ones=('style', 'script'))
+        string = remove_tags(string)
         return string
 
     def process_item(self, item, spider):
