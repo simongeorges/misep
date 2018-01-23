@@ -4,7 +4,6 @@ from gensim.parsing.porter import PorterStemmer
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
-import re
 import time
 from w3lib.html import remove_tags, remove_tags_with_content
 
